@@ -5,133 +5,103 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Lab 4 - Spatial Filtering</title>
   <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Source+Code+Pro:wght@400;600&display=swap');
     :root{
-      --bg:#f7f9fc;
+      --bg:#f6fbfb;
       --surface:#ffffff;
-      --surface-2:#f1f5ff;
-      --text:#172033;
-      --muted:#5b6780;
-      --line:#dbe3f3;
-      --royal:#2246c7;
-      --royal-2:#3a63ff;
-      --royal-3:#0f2d8a;
-      --gold:#c8a64d;
-      --success:#0f766e;
-      --shadow:0 12px 35px rgba(20,44,120,.10);
+      --surface-2:#eef7f7;
+      --text:#17313a;
+      --muted:#58707a;
+      --line:#d8e7ea;
+      --royal:#2f6fbd;
+      --royal-2:#3b89c9;
+      --royal-3:#1d4f7f;
+      --teal:#2b8c87;
+      --gold:#c7a455;
+      --shadow:0 12px 30px rgba(32,84,118,.10);
       --radius:18px;
+      --code-bg:#f4efff;
+      --code-line:#d9cdfc;
+      --code-text:#2a2150;
     }
     *{box-sizing:border-box}
     html{scroll-behavior:smooth}
     body{
       margin:0;
-      font-family:Inter,Segoe UI,Roboto,Arial,sans-serif;
+      font-family:'Inter',Segoe UI,Roboto,Arial,sans-serif;
       color:var(--text);
-      background:linear-gradient(180deg,#fbfcff 0%,#f4f7fe 100%);
-      line-height:1.7;
+      background:linear-gradient(180deg,#fbfefe 0%,#f2f8f9 100%);
+      line-height:1.72;
     }
     .container{width:min(1180px,92%);margin:0 auto}
     .hero{
-      background:linear-gradient(135deg,#ffffff 0%,#eef3ff 55%,#e4ecff 100%);
+      background:linear-gradient(135deg,#ffffff 0%,#eef8fb 55%,#e4f1f7 100%);
       border-bottom:1px solid var(--line);
       padding:42px 0 30px;
       position:relative;
       overflow:hidden;
     }
-    .hero:before,.hero:after{
-      content:"";position:absolute;border-radius:50%;filter:blur(8px);opacity:.12;
-    }
-    .hero:before{width:260px;height:260px;background:var(--royal-2);top:-80px;right:-60px}
-    .hero:after{width:180px;height:180px;background:var(--gold);bottom:-70px;left:-40px}
-    .top-meta{
-      display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;
-    }
+    .hero:before,.hero:after{content:"";position:absolute;border-radius:50%;opacity:.10;filter:blur(8px)}
+    .hero:before{width:240px;height:240px;background:var(--royal-2);top:-70px;right:-50px}
+    .hero:after{width:180px;height:180px;background:var(--teal);bottom:-70px;left:-35px}
+    .top-meta{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
     .meta-card{
-      background:rgba(255,255,255,.88);backdrop-filter:blur(8px);
-      border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow);
+      background:rgba(255,255,255,.9);border:1px solid var(--line);border-radius:16px;padding:14px 16px;box-shadow:var(--shadow)
     }
     .meta-card .label{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:700}
     .meta-card .value{font-size:1rem;font-weight:700;margin-top:5px;color:var(--royal-3)}
-    h1,h2,h3{line-height:1.2;margin:0 0 12px}
-    h1{font-size:clamp(2rem,4vw,3.4rem);letter-spacing:-.03em}
+    h1,h2,h3,h4{line-height:1.2;margin:0 0 12px}
+    h1{font-size:clamp(2rem,4vw,3.35rem);letter-spacing:-.03em;color:var(--royal-3)}
     h2{font-size:1.75rem;color:var(--royal-3);margin-top:8px}
     h3{font-size:1.15rem;color:var(--royal)}
-    .subtitle{max-width:900px;font-size:1.06rem;color:var(--muted);margin:0 0 22px}
+    h4{font-size:1rem;color:var(--teal)}
+    p{margin:10px 0}
+    .subtitle{max-width:920px;font-size:1.05rem;color:var(--muted);margin:0 0 22px}
     .hero-grid{display:grid;grid-template-columns:1.35fr .95fr;gap:24px;align-items:start}
     .callout{
-      background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--royal);
-      border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)
+      background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--teal);border-radius:16px;padding:16px 18px;box-shadow:var(--shadow)
     }
     .pill-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
-    .pill{
-      background:#fff;border:1px solid #cfd9f1;color:var(--royal-3);padding:8px 12px;border-radius:999px;
-      font-size:.92rem;font-weight:700
-    }
+    .pill{background:#fff;border:1px solid #cfe0e7;color:var(--royal-3);padding:8px 12px;border-radius:999px;font-size:.92rem;font-weight:700}
     main{padding:32px 0 60px}
     section{margin:24px 0 34px}
     .section-card{
-      background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
-      box-shadow:var(--shadow);padding:28px
+      background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:28px
     }
     .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
     .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
-    .mini-card{
-      background:linear-gradient(180deg,#fff 0%,#f8faff 100%);
-      border:1px solid var(--line);border-radius:16px;padding:18px
-    }
-    .mini-card p,.section-card p{margin:10px 0}
+    .mini-card{background:linear-gradient(180deg,#fff 0%,#f9fdfd 100%);border:1px solid var(--line);border-radius:16px;padding:18px}
     ul{padding-left:20px;margin:10px 0}
     li{margin:6px 0}
-    .flow{
-      display:grid;gap:12px;margin-top:16px
-    }
-    .flow-step{
-      background:var(--surface-2);border:1px solid #d7e1ff;border-radius:14px;padding:14px 16px
-    }
-    .tag{display:inline-block;font-size:.78rem;font-weight:800;color:var(--royal);background:#eaf0ff;border:1px solid #d3defe;border-radius:999px;padding:5px 10px;margin-bottom:10px}
+    .tag{display:inline-block;font-size:.78rem;font-weight:800;color:var(--royal);background:#e8f3fb;border:1px solid #d2e6f6;border-radius:999px;padding:5px 10px;margin-bottom:10px}
     .filter-group{margin-top:22px}
-    .filter-card{
-      border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:18px;background:#fff
-    }
+    .filter-card{border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:18px;background:#fff}
     .filter-card header{display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:10px}
-    .badge{background:#eef3ff;color:var(--royal-3);border:1px solid #d7e2ff;padding:7px 10px;border-radius:999px;font-size:.84rem;font-weight:800}
+    .badge{background:#eaf6f5;color:var(--teal);border:1px solid #cfe8e5;padding:7px 10px;border-radius:999px;font-size:.84rem;font-weight:800}
     .split{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:14px}
-    details{
-      border:1px solid var(--line);border-radius:14px;background:#fbfcff;overflow:hidden
-    }
+    .subbox{background:#f8fcfc;border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin-top:12px}
+    details{border:1px solid var(--line);border-radius:14px;background:#fbfcff;overflow:hidden}
     details + details{margin-top:12px}
-    summary{
-      list-style:none;cursor:pointer;padding:14px 16px;font-weight:800;color:var(--royal-3);
-      background:linear-gradient(180deg,#f8faff 0%,#f0f5ff 100%);border-bottom:1px solid transparent
-    }
+    summary{list-style:none;cursor:pointer;padding:14px 16px;font-weight:800;color:var(--royal-3);background:linear-gradient(180deg,#f7fbff 0%,#eff6ff 100%);border-bottom:1px solid transparent}
     details[open] summary{border-bottom-color:var(--line)}
     summary::-webkit-details-marker{display:none}
     .toggle-body{padding:14px 16px}
     pre{
-      margin:0;background:#0f1830;color:#eef4ff;padding:16px;border-radius:12px;overflow:auto;
-      font-size:.92rem;line-height:1.55
+      margin:0;background:linear-gradient(180deg,var(--code-bg),#efe7ff);color:var(--code-text);padding:16px;border-radius:12px;overflow:auto;
+      font-size:.92rem;line-height:1.55;border:1px solid var(--code-line);border-left:5px solid #a88af7;font-family:'Source Code Pro',Consolas,Monaco,'Courier New',monospace
     }
-    code{font-family:Consolas,Monaco,'Courier New',monospace}
+    code{font-family:'Source Code Pro',Consolas,Monaco,'Courier New',monospace}
     table{width:100%;border-collapse:collapse;margin-top:14px;font-size:.95rem}
     th,td{border:1px solid var(--line);padding:12px 10px;vertical-align:top}
-    th{background:#eef3ff;color:var(--royal-3);text-align:left}
-    .note{
-      background:#fff9ea;border:1px solid #f0dfaf;border-radius:14px;padding:14px 16px;color:#5f4b12
-    }
-    .royal-note{
-      background:#eff4ff;border:1px solid #d6e1ff;border-radius:14px;padding:14px 16px;color:#21335f
-    }
-    .footer{
-      margin-top:30px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.95rem
-    }
+    th{background:#edf7f9;color:var(--royal-3);text-align:left}
+    .note{background:#fff9ea;border:1px solid #f0dfaf;border-radius:14px;padding:14px 16px;color:#5f4b12}
+    .royal-note{background:#eef7fb;border:1px solid #d7eaf3;border-radius:14px;padding:14px 16px;color:#244659}
+    .footer{margin-top:30px;padding-top:20px;border-top:1px solid var(--line);color:var(--muted);font-size:.95rem}
     .toc{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}
     .toc a{text-decoration:none;color:var(--royal-3);font-weight:700;background:#fff;border:1px solid var(--line);padding:12px 14px;border-radius:12px}
-    .toc a:hover{border-color:#a8bbf5;background:#f7f9ff}
-    .equation{
-      background:#f8fbff;border:1px dashed #bfd0ff;border-radius:14px;padding:12px 14px;font-family:Cambria,Georgia,serif
-    }
-    @media (max-width:980px){
-      .hero-grid,.grid-2,.grid-3,.split,.top-meta,.toc{grid-template-columns:1fr}
-    }
+    .toc a:hover{border-color:#aac9d9;background:#f7fcfd}
+    .equation{background:#f8fcfe;border:1px dashed #bfd8e7;border-radius:14px;padding:12px 14px;font-family:Cambria,Georgia,serif}
+    @media (max-width:980px){.hero-grid,.grid-2,.grid-3,.split,.top-meta,.toc{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -147,7 +117,7 @@
         <div>
           <div class="tag">Lab 4</div>
           <h1>Spatial Filtering</h1>
-          <p class="subtitle">This lab explains the main spatial filters used in digital image processing, with emphasis on MATLAB built-in functions first and manual implementation second. The goal is to help students understand what each filter does, when to use it, and how the built-in behavior connects to the underlying math.</p>
+          <p class="subtitle">This explanation page introduces the main spatial filters used in digital image processing, with emphasis on MATLAB built-in functions first and manual implementation second. The page is designed to help students quickly decide which filter to choose, how to call it in MATLAB, and what effect to expect on the image.</p>
           <div class="pill-row">
             <span class="pill">Linear filters</span>
             <span class="pill">Nonlinear filters</span>
@@ -157,9 +127,9 @@
           </div>
         </div>
         <div class="callout">
-          <h3>What makes this lab different?</h3>
-          <p>We start with the MATLAB functions students are most likely to use in the lab, then reveal the equivalent manual implementation to build intuition. This order keeps the workflow practical while still teaching the algorithmic idea behind each operation.</p>
-          <p>Example images in the lab should be taken from Gonzalez and Woods, <em>Digital Image Processing</em>, 3rd edition. That matters because many classic filtering examples in the course are aligned with those images, so the explanations should refer to them as the visual reference set.</p>
+          <h3>Reference note</h3>
+          <p>Example images in the lab should be taken from Gonzalez and Woods, <em>Digital Image Processing</em>, 3rd edition. That gives the lab a familiar visual reference and keeps the examples aligned with standard textbook figures used in class.</p>
+          <p>The explanations below begin with the built-in MATLAB workflow students are most likely to use in the lab, then connect that workflow to the underlying manual implementation.</p>
         </div>
       </div>
     </div>
@@ -173,8 +143,8 @@
         <a href="#prep">1. Preparation and image notes</a>
         <a href="#linear">2. Linear filters</a>
         <a href="#nonlinear">3. Nonlinear filters</a>
-        <a href="#comparison">4. Built-in vs manual view</a>
-        <a href="#tasks">5. Suggested lab tasks</a>
+        <a href="#compare">4. Which filter to use</a>
+        <a href="#comparison">5. Built-in vs manual view</a>
         <a href="#notes">6. Common notes and pitfalls</a>
       </div>
     </section>
@@ -217,6 +187,8 @@
             <span class="badge">Smoothing · Linear</span>
           </header>
           <div class="equation">Typical 3×3 mask: (1/9) × ones(3,3)</div>
+          <div class="subbox"><h4>How to use it</h4><p>Use <code>fspecial('average',[m n])</code> to build the mask, then apply it with <code>imfilter(I,H,'replicate')</code>. Increase the mask size when you want stronger blur, but expect more loss of fine detail and sharper edge softening.</p></div>
+          <div class="subbox"><h4>Best use</h4><p>Choose it when you need a simple low-pass filter, want easy MATLAB syntax, or need a quick baseline smoothing result for comparison.</p></div>
           <div class="split">
             <div>
               <details>
@@ -246,9 +218,8 @@ imshow(J); title('Manual Average Filter');</code></pre></div>
             <div>
               <ul>
                 <li><strong>Built-in focus:</strong> emphasize <code>fspecial('average')</code> and <code>imfilter</code>.</li>
-                <li>Explain that normalization is essential so brightness does not increase.</li>
-                <li>Use textbook images containing texture or noise so the smoothing effect is obvious.</li>
-                <li>Good comparison task: 3×3 vs 5×5 vs 9×9 masks.</li>
+                <li>Normalization is essential so brightness does not increase.</li>
+                <li>Use it as the simplest reference smoothing filter in comparisons.</li>
               </ul>
             </div>
           </div>
@@ -263,6 +234,8 @@ imshow(J); title('Manual Average Filter');</code></pre></div>
             <span class="badge">Smoothing · Linear</span>
           </header>
           <div class="equation">Example mask: (1/16) × [1 2 1; 2 4 2; 1 2 1]</div>
+          <div class="subbox"><h4>How to use it</h4><p>Define the weighted mask manually, normalize it so the coefficients sum to 1, then call <code>imfilter</code>. This is often introduced as a stepping stone between a plain average filter and a Gaussian filter.</p></div>
+          <div class="subbox"><h4>Best use</h4><p>Choose it when you want mild smoothing but would like to preserve central structure better than a uniform box filter.</p></div>
           <div class="split">
             <div>
               <details>
@@ -287,9 +260,9 @@ J = uint8(J);</code></pre></div>
             </div>
             <div>
               <ul>
-                <li>This is a useful bridge between a box filter and a Gaussian filter.</li>
-                <li>Students should notice that center weighting preserves structures slightly better.</li>
+                <li>Center weighting usually preserves important structure slightly better.</li>
                 <li>Because the mask is symmetric, correlation and convolution give the same result.</li>
+                <li>Useful when you want students to see why all averages are not equally good.</li>
               </ul>
             </div>
           </div>
@@ -303,6 +276,8 @@ J = uint8(J);</code></pre></div>
             </div>
             <span class="badge">Smoothing · Linear</span>
           </header>
+          <div class="subbox"><h4>How to use it</h4><p>Create the kernel with <code>fspecial('gaussian',[m n],sigma)</code> and apply it with <code>imfilter</code>. Control the blur using both the kernel size and the value of <code>sigma</code>; larger values produce stronger smoothing.</p></div>
+          <div class="subbox"><h4>Best use</h4><p>Choose it when you want smooth noise reduction, more natural blur, or preprocessing before derivative-based filters such as Sobel or Laplacian.</p></div>
           <div class="split">
             <div>
               <details>
@@ -332,7 +307,7 @@ J = uint8(J);</code></pre></div>
               <ul>
                 <li>Discuss the effect of kernel size and standard deviation <code>sigma</code>.</li>
                 <li>Larger kernels and larger sigma values produce stronger blur.</li>
-                <li>This is often the preferred smoothing operator before gradient-based edge detection.</li>
+                <li>Often the preferred smoothing operator before edge detection.</li>
               </ul>
             </div>
           </div>
@@ -347,6 +322,8 @@ J = uint8(J);</code></pre></div>
             <span class="badge">Sharpening · Linear</span>
           </header>
           <div class="equation">Common mask: [0 -1 0; -1 4 -1; 0 -1 0]</div>
+          <div class="subbox"><h4>How to use it</h4><p>Use <code>fspecial('laplacian',alpha)</code> or define the mask manually, compute the Laplacian response, then combine it with the original image for sharpening. Convert to <code>double</code> first so subtraction and addition behave correctly.</p></div>
+          <div class="subbox"><h4>Best use</h4><p>Choose it when you want to emphasize fine detail or sharpen intensity transitions, especially after light smoothing to reduce noise sensitivity.</p></div>
           <div class="split">
             <div>
               <details>
@@ -373,8 +350,9 @@ J = uint8(max(min(J,255),0));</code></pre></div>
             </div>
             <div>
               <ul>
-                <li>Explain the difference between detecting edges with the Laplacian itself and sharpening by subtracting or adding it.</li>
-                <li>Since second derivatives are sensitive to noise, a smoothed image is often preferred first.</li>
+                <li>Explain the difference between displaying the Laplacian and using it for sharpening.</li>
+                <li>Second derivatives are sensitive to noise, so pre-smoothing can help.</li>
+                <li>Good for showing why sharpening is different from simple edge extraction.</li>
               </ul>
             </div>
           </div>
@@ -388,6 +366,8 @@ J = uint8(max(min(J,255),0));</code></pre></div>
             </div>
             <span class="badge">Sharpening / Edge Detection · Linear</span>
           </header>
+          <div class="subbox"><h4>How to use it</h4><p>Use <code>fspecial('sobel')</code> for one direction, transpose it for the other, then compute horizontal and vertical responses and combine them into a magnitude image. Use <code>mat2gray</code> when preparing the magnitude for display.</p></div>
+          <div class="subbox"><h4>Best use</h4><p>Choose it when you need edge strength, gradient direction intuition, or a strong classroom example of first-derivative filtering.</p></div>
           <div class="split">
             <div>
               <details>
@@ -420,8 +400,8 @@ Mag = uint8(255 * mat2gray(Mag));</code></pre></div>
             <div>
               <ul>
                 <li>Teach horizontal and vertical gradients separately before combining them.</li>
-                <li>Great examples are images with clear object boundaries from the textbook.</li>
-                <li>Students should understand that Sobel is not a smoothing filter, but its coefficients include mild smoothing.</li>
+                <li>Its coefficients contain mild smoothing compared with simpler derivative masks.</li>
+                <li>Great for boundary emphasis and edge interpretation.</li>
               </ul>
             </div>
           </div>
@@ -435,6 +415,8 @@ Mag = uint8(255 * mat2gray(Mag));</code></pre></div>
             </div>
             <span class="badge">Sharpening / Edge Detection · Linear</span>
           </header>
+          <div class="subbox"><h4>How to use it</h4><p>Use <code>fspecial('prewitt')</code> or define the masks manually, compute directional responses, then combine them into a magnitude image. The workflow is very similar to Sobel, which makes it ideal for side-by-side teaching.</p></div>
+          <div class="subbox"><h4>Best use</h4><p>Choose it when you want a simple gradient operator and when the goal is to compare first-derivative masks rather than maximize smoothing.</p></div>
           <div class="split">
             <div>
               <details>
@@ -463,8 +445,9 @@ Mag = uint8(255 * mat2gray(Mag));</code></pre></div>
             </div>
             <div>
               <ul>
-                <li>Compare Prewitt and Sobel on the same image so students can see that both estimate gradients.</li>
-                <li>Prewitt is slightly simpler, while Sobel gives more weight to the center row or column.</li>
+                <li>Compare Prewitt and Sobel on the same image for learning value.</li>
+                <li>Prewitt is slightly simpler, while Sobel weights the center row or column more.</li>
+                <li>Useful for teaching the concept of gradient masks clearly.</li>
               </ul>
             </div>
           </div>
@@ -479,6 +462,8 @@ Mag = uint8(255 * mat2gray(Mag));</code></pre></div>
             <span class="badge">Sharpening · Linear</span>
           </header>
           <div class="equation">High-boost idea: J = A·I - blurred(I), where A &gt; 1</div>
+          <div class="subbox"><h4>How to use it</h4><p>First blur the image, subtract the blurred version from the original to obtain a detail mask, then add a scaled version of that mask back to the image. In MATLAB, this is easy to organize using <code>fspecial</code>, <code>imfilter</code>, and a gain parameter.</p></div>
+          <div class="subbox"><h4>Best use</h4><p>Choose it when the image is slightly blurred and you want stronger controllable sharpening than Laplacian alone, especially when you want to tune the boost amount.</p></div>
           <div class="split">
             <div>
               <details>
@@ -512,7 +497,7 @@ J = uint8(max(min(J,255),0));</code></pre></div>
               <ul>
                 <li>Start from the intuition of blurred image plus detail mask.</li>
                 <li>Explain the relation between unsharp masking and high-boost filtering.</li>
-                <li>Use a slightly blurred textbook image to make the sharpening effect easy to observe.</li>
+                <li>Increasing the boost also increases the risk of noise amplification.</li>
               </ul>
             </div>
           </div>
@@ -522,12 +507,14 @@ J = uint8(max(min(J,255),0));</code></pre></div>
 
     <section class="section-card" id="nonlinear">
       <h2>Nonlinear filters</h2>
-      <p>Nonlinear filters do not compute a weighted sum. Instead, they examine the values inside the neighborhood and choose an output using ranking or extrema, which makes them very useful for impulse noise and morphological-like effects.</p>
+      <p>Nonlinear filters do not compute a weighted sum. Instead, they examine the values inside the neighborhood and choose an output using ranking or extrema, which makes them very useful for impulse noise and local neighborhood analysis.</p>
 
       <div class="grid-2">
         <div class="mini-card">
           <h3>Median Filter</h3>
           <p>The median filter replaces the center pixel with the median of the neighborhood values. It is especially effective against salt-and-pepper noise because it removes isolated spikes without averaging across edges too aggressively.</p>
+          <div class="subbox"><h4>How to use it</h4><p>Call <code>medfilt2(I,[m n])</code> on a grayscale image. Small windows such as 3×3 are common because they remove impulse noise while keeping edges more intact than simple averaging.</p></div>
+          <div class="subbox"><h4>Best use</h4><p>Use it first when the noise type is salt-and-pepper or impulse noise.</p></div>
           <details>
             <summary>Show MATLAB built-in function</summary>
             <div class="toggle-body"><pre><code>I = imread('your_image.png');
@@ -553,6 +540,8 @@ end</code></pre></div>
         <div class="mini-card">
           <h3>Max Filter</h3>
           <p>The max filter assigns the largest value in the neighborhood to the output pixel. It tends to brighten small bright regions and can expand light details.</p>
+          <div class="subbox"><h4>How to use it</h4><p>Use <code>ordfilt2(I,k,domain)</code> with <code>k</code> equal to the last ordered element in the neighborhood. For a 3×3 window, that means <code>k = 9</code>.</p></div>
+          <div class="subbox"><h4>Best use</h4><p>Choose it when you want to emphasize or expand bright structures in a local neighborhood.</p></div>
           <details>
             <summary>Show MATLAB built-in function</summary>
             <div class="toggle-body"><pre><code>I = imread('your_image.png');
@@ -578,6 +567,8 @@ end</code></pre></div>
         <div class="mini-card">
           <h3>Min Filter</h3>
           <p>The min filter assigns the smallest value in the neighborhood to the output pixel. It tends to darken small dark regions and can expand dark details.</p>
+          <div class="subbox"><h4>How to use it</h4><p>Use <code>ordfilt2(I,1,ones(3,3))</code> for a 3×3 neighborhood. This makes the smallest local intensity become the output at each pixel.</p></div>
+          <div class="subbox"><h4>Best use</h4><p>Choose it when you want to emphasize dark structures or study the effect of local minima.</p></div>
           <details>
             <summary>Show MATLAB built-in function</summary>
             <div class="toggle-body"><pre><code>I = imread('your_image.png');
@@ -603,6 +594,8 @@ end</code></pre></div>
         <div class="mini-card">
           <h3>Range Filter</h3>
           <p>The range filter computes the difference between the maximum and minimum values in the neighborhood. This highlights local variation and often responds strongly near edges and textured areas.</p>
+          <div class="subbox"><h4>How to use it</h4><p>Call <code>rangefilt(I,true(3))</code> or any other neighborhood shape you want to study. Display the result with <code>imshow(J,[])</code> because the output often needs scaling for visualization.</p></div>
+          <div class="subbox"><h4>Best use</h4><p>Choose it when your goal is to measure local variation, texture, or edge activity rather than smooth the image.</p></div>
           <details>
             <summary>Show MATLAB built-in function</summary>
             <div class="toggle-body"><pre><code>I = imread('your_image.png');
@@ -625,6 +618,77 @@ end</code></pre></div>
           </details>
         </div>
       </div>
+    </section>
+
+    <section class="section-card" id="compare">
+      <h2>Which filter to use</h2>
+      <p>This comparison is meant to help students make a quick practical choice before coding. The best filter depends on whether the goal is smoothing, sharpening, edge emphasis, impulse-noise removal, or local variation analysis.</p>
+      <table>
+        <thead>
+          <tr>
+            <th>Situation</th>
+            <th>Recommended filter</th>
+            <th>Why it fits</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>You need the simplest smoothing baseline</td>
+            <td>Average filter</td>
+            <td>It is the easiest low-pass filter to understand and implement.</td>
+          </tr>
+          <tr>
+            <td>You want smoothing with slightly better center preservation</td>
+            <td>Weighted average filter</td>
+            <td>The center pixel has higher influence than its neighbors.</td>
+          </tr>
+          <tr>
+            <td>You want smoother and more natural blur</td>
+            <td>Gaussian filter</td>
+            <td>Its weights decay smoothly with distance and it works well before derivative filters.</td>
+          </tr>
+          <tr>
+            <td>You want detail emphasis through second derivatives</td>
+            <td>Laplacian filter</td>
+            <td>It responds strongly to rapid intensity change and is commonly used for sharpening.</td>
+          </tr>
+          <tr>
+            <td>You want gradient-based edge strength</td>
+            <td>Sobel filter</td>
+            <td>It gives directional derivatives and a strong practical edge magnitude image.</td>
+          </tr>
+          <tr>
+            <td>You want a simpler gradient-mask comparison</td>
+            <td>Prewitt filter</td>
+            <td>It is easy to interpret and compare with Sobel.</td>
+          </tr>
+          <tr>
+            <td>You want controllable sharpening from a blurred image</td>
+            <td>High-boost filter</td>
+            <td>It sharpens by adding scaled detail back to the original image.</td>
+          </tr>
+          <tr>
+            <td>You have salt-and-pepper noise</td>
+            <td>Median filter</td>
+            <td>It removes isolated outliers without averaging them across the neighborhood.</td>
+          </tr>
+          <tr>
+            <td>You want to expand bright details</td>
+            <td>Max filter</td>
+            <td>Each output becomes the local maximum.</td>
+          </tr>
+          <tr>
+            <td>You want to expand dark details</td>
+            <td>Min filter</td>
+            <td>Each output becomes the local minimum.</td>
+          </tr>
+          <tr>
+            <td>You want local contrast or texture activity</td>
+            <td>Range filter</td>
+            <td>It measures the difference between local maximum and local minimum.</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
 
     <section class="section-card" id="comparison">
@@ -665,17 +729,6 @@ end</code></pre></div>
           </tr>
         </tbody>
       </table>
-    </section>
-
-    <section class="section-card" id="tasks">
-      <h2>Suggested lab tasks</h2>
-      <div class="flow">
-        <div class="flow-step"><strong>Task 1.</strong> Apply average, weighted average, and Gaussian smoothing to one textbook image. Compare blur strength and edge preservation.</div>
-        <div class="flow-step"><strong>Task 2.</strong> Apply Laplacian, Sobel, and Prewitt filters to the same image. Compare which details become strongest in each result.</div>
-        <div class="flow-step"><strong>Task 3.</strong> Build a high-boost result using different boost factors and discuss the visual trade-off between sharpening and noise amplification.</div>
-        <div class="flow-step"><strong>Task 4.</strong> Add salt-and-pepper noise, then compare box filtering and median filtering. Explain why the median usually performs better for impulse noise.</div>
-        <div class="flow-step"><strong>Task 5.</strong> Implement one linear filter and one nonlinear filter manually, then compare the output with the MATLAB built-in version.</div>
-      </div>
     </section>
 
     <section class="section-card" id="notes">
